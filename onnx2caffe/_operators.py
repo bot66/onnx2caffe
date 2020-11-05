@@ -337,6 +337,44 @@ def _convert_upsample(node, graph, err):
     return layer
 
 
+def _convert_resize(node, graph, err):
+    factor = int(node.attrs["cubic_coeff_a"])
+    node_name = node.name
+    input_name = str(node.inputs[0])
+    output_name = str(node.outputs[0])
+    channels = graph.channel_dims[input_name]
+    node.inputs[1]
+ 
+    pad = int(math.ceil((factor - 1) / 2.))
+    mode = node.attrs["mode"]
+
+    factor = 2
+  
+    if mode == "bilinear":
+        layer = myf("Deconvolution", node_name, [input_name], [output_name],
+                    convolution_param=dict(
+                        num_output=channels,
+                        kernel_size=2 * factor - factor % 2,
+                        stride=factor,
+                        pad=pad,
+                        group=channels,
+                        bias_term=False,
+                        weight_filler=dict(type="bilinear_upsampling")
+                    ))
+    else:
+        layer = myf("Deconvolution", node_name, [input_name], [output_name],
+                     convolution_param=dict(
+                        num_output=channels,
+                        kernel_size=factor,
+                        stride=factor,
+                        group=channels,
+                        bias_term=False,
+                    ))
+
+    graph.channel_dims[output_name] = graph.channel_dims[input_name]
+    return layer
+
+
 def _convert_concat(node, graph, err):
     node_name = node.name
     input_name_list = [str(i) for i in node.inputs]
@@ -447,6 +485,7 @@ _ONNX_NODE_REGISTRY = {
     "Dropout": _convert_dropout,
     "Gemm": _convert_gemm,
     "Upsample": _convert_upsample,
+    "Resize": _convert_resize,
     "Concat": _convert_concat,
     "ConvTranspose": _convert_conv_transpose,
     "Sigmoid": _convert_sigmoid,

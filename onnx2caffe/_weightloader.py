@@ -163,6 +163,7 @@ _ONNX_NODE_REGISTRY = {
     "Dropout": _convert_dropout,
     "Gemm": _convert_gemm,
     "Upsample": _convert_upsample,
+    "Resize": _convert_upsample,
     "Concat": _convert_concat,
     "ConvTranspose": _convert_conv_transpose,
     "Sigmoid": _convert_sigmoid,
