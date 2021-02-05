@@ -43,7 +43,7 @@ def convertToCaffe(graph, prototxt_save_path, caffe_model_save_path):
         if input_non_exist_flag:
             continue
         
-        if op_type != "GlobalAveragePool":
+        if op_type != "GlobalAveragePool" and op_type != 'Resize':
            if op_type not in cvt._ONNX_NODE_REGISTRY:
               err.unsupported_op(node)
               continue
@@ -98,11 +98,12 @@ def getGraph(onnx_path):
 
     return graph
 
+import sys
 
 if __name__ == "__main__":
-    onnx_path = "/home/lichen/project/yolov5/onnx2caffe/model/onnx/best-sim.onnx"
-    prototxt_path = "/home/lichen/project/yolov5/onnx2caffe/model/caffe/best-sim.prototxt"
-    caffemodel_path = "/home/lichen/project/yolov5/onnx2caffe/model/caffe/best-sim.caffemodel"
+    onnx_path = sys.argv[1]
+    prototxt_path = sys.argv[2]
+    caffemodel_path = sys.argv[3]
     graph = getGraph(onnx_path)
     convertToCaffe(graph, prototxt_path, caffemodel_path)
 
